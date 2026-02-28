@@ -1,9 +1,9 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'base_game_view_model.dart';
 
-class agacViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  final int correctClicks = 5;
+class agacViewModel extends BaseGameViewModel {
+  agacViewModel() : super(correctClicks: 5);
+
   late List<String> textlist ;
   late String hedefHarf; // hangi harfi toplayacağız
   List<bool> visibleList = []; // hangi butonlar görünür
@@ -29,6 +29,6 @@ class agacViewModel extends ChangeNotifier {
       _basket.add(textlist[index]);
       notifyListeners();
     }
-    totalClicks++;
+    incrementTotalClicks();
   }
 }

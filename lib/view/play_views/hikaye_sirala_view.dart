@@ -1,3 +1,5 @@
+import 'package:disleksi_surum/view/ortak_bosluk/yonerge.dart';
+import 'package:disleksi_surum/view/play_views/yakala_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewModel/hikaye_sirala_view_model.dart';
@@ -19,6 +21,43 @@ class HikayeSiralaPage extends StatelessWidget {
       child: Scaffold(
         body: Consumer2<HikayeSiralaViewModel, TtsViewModel>(
           builder: (context, viewModel, tts, _) {
+            if (viewModel.shouldNavigateNext) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                viewModel.consumeNavigateNext();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const Yonerge(
+                      text: 'Sincapı yakala',
+                      page: YakalamaGame(),
+                    ),
+                  ),
+                );
+              });
+            }
+
+            if (viewModel.shouldShowTryAgain) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                viewModel.consumeTryAgainDialog();
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Yanlış sıra 😢"),
+                    content: const Text("Sahneleri doğru sırayla dizmeyi dene."),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          viewModel.resetGame();
+                        },
+                        child: const Text("Tekrar Dene"),
+                      ),
+                    ],
+                  ),
+                );
+              });
+            }
+
             return Container(
               width: widthscreen,
               height: heightscreen,
@@ -57,7 +96,7 @@ class HikayeSiralaPage extends StatelessWidget {
                           final placedImage = viewModel.placedImages[index];
                           return DragTarget<String>(
                             onAcceptWithDetails: (details) {
-                              viewModel.placeImage(index, details.data, context);
+                              viewModel.placeImage(index, details.data);
                             },
                             builder: (context, candidateData, rejectedData) {
                               return Container(

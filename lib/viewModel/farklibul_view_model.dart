@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'base_game_view_model.dart';
 
-class FarkliBulViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  final int correctClicks = 1;
+class FarkliBulViewModel extends BaseGameViewModel {
+  FarkliBulViewModel() : super(correctClicks: 1);
 
   bool isCorrect = false;
 
   bool kontrolEt(String imagepath, String harf) {
-    totalClicks++;
+    incrementTotalClicks();
     if (imagepath == harf) {
       isCorrect = true;
     } else {

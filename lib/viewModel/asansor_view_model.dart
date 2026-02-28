@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+import 'base_game_view_model.dart';
 
-class AsansorViewModel extends ChangeNotifier {
+class AsansorViewModel extends BaseGameViewModel {
+  AsansorViewModel() : super(correctClicks: 3) {
+    _initFloors();
+    _generateTargets();
+  }
+
   final Random _random = Random();
-
-  // Tıklama sayıları
-  int totalClicks = 0;
-  final int correctClicks = 3;
 
   // Tur sayısı
   final int totalRounds = 3;
@@ -28,11 +29,6 @@ class AsansorViewModel extends ChangeNotifier {
   int get currentFloor => _currentFloor;
   int get targetFloor => _targetFloor;
   double get floorHeight => _floorHeight;
-
-  AsansorViewModel() {
-    _initFloors();
-    _generateTargets();
-  }
 
   void _initFloors() {
     for (int i = 0; i < 6; i++) {
@@ -71,7 +67,7 @@ class AsansorViewModel extends ChangeNotifier {
 
   /// True dönerse oyun bitmiş demektir
   bool checkIfAtTarget() {
-    totalClicks++;
+    incrementTotalClicks();
 
     if (_currentFloor == _targetFloor) {
       completedRounds++;

@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'base_game_view_model.dart';
 
-class FonemViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  final int correctClicks = 1;
+class FonemViewModel extends BaseGameViewModel {
+  FonemViewModel() : super(correctClicks: 1);
+
   bool kontrol = false;
   bool kontrol2=false;
 
@@ -13,7 +13,7 @@ class FonemViewModel extends ChangeNotifier {
     } else {
       kontrol = false;
     }
-    totalClicks++;
+    incrementTotalClicks();
     notifyListeners();
   }
   void Kontrol2(String harf, String text) {
@@ -24,7 +24,7 @@ class FonemViewModel extends ChangeNotifier {
     else{
       kontrol2=false;
     }
-    totalClicks++;
+    incrementTotalClicks();
     notifyListeners();
   }
 }

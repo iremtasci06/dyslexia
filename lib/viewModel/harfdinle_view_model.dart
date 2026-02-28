@@ -1,12 +1,9 @@
-import 'package:flutter/material.dart';
+import 'base_game_view_model.dart';
 import 'tts_view_model.dart';
 
-class LetterQuizViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  int correctClicks = 0; // Doğru tıklamaları sayacak
-
+class LetterQuizViewModel extends BaseGameViewModel {
   final TtsViewModel tts;
-  LetterQuizViewModel(this.tts) {
+  LetterQuizViewModel(this.tts) : super(correctClicks: 0) {
     _remainingLetters = List.from(letters);
     generateQuestion();
   }
@@ -39,10 +36,10 @@ class LetterQuizViewModel extends ChangeNotifier {
   }
 
   void checkAnswer(String selected) {
-    totalClicks++;
+    incrementTotalClicks();
 
     if (selected == currentLetter) {
-      correctClicks++; // Sadece doğru ise artır
+      incrementCorrectClicks(); // Sadece doğru ise artır
       feedback = "Doğru! $currentLetter harfini duydun";
     } else {
       feedback = "Yanlış! Doğru cevap: $currentLetter";
@@ -60,8 +57,7 @@ class LetterQuizViewModel extends ChangeNotifier {
   }
 
   void reset() {
-    totalClicks = 0;
-    correctClicks = 0; // resetle
+    resetGameCounters(correctClicksValue: 0, notify: false);
     _remainingLetters = List.from(letters);
     isFinished = false;
     generateQuestion();

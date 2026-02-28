@@ -36,41 +36,55 @@ class _ModernBearHeadViewState extends State<ModernBearHeadView> {
                 Expanded(
                   flex: 5,
                   child: Center(
-                    child: GestureDetector(
-                      onTapDown: (details) => viewModel.handleTap(
-                        details.localPosition,
-                        const Size(400, 400),
-                            () {
-                              Future.delayed(const Duration(seconds: 2), () async{
-                                final timerVM = Provider.of<GameTimerViewModel>(context, listen: false);
-                                timerVM.stopTimer();
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final side = constraints.biggest.shortestSide.clamp(
+                          260.0,
+                          400.0,
+                        );
+                        final paintSize = Size(side, side);
 
-                                final vm2 = Provider.of<GameResultViewModel>(context, listen: false);
-                                await vm2.saveGameResult(
-                                  letter: 'boyama_ayi',
-                                  totalClicks: viewModel.totalClicks,
-                                  correctClicks: viewModel.correctClicks,
-                                  durationseconds: timerVM.totalSeconds,
-                                    koleksiyonadi: 'Sayilar'
-                                );
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => const HouseView(),
-                                  ),
-                                );
-                              });
-                            },
-                      ),
-                      child: CustomPaint(
-                        size: const Size(400, 400),
-                        painter: CuteBearPainter(
-                          faceColor: viewModel.faceColor,
-                          earColor: viewModel.earColor,
-                          innerEarColor: viewModel.innerEarColor,
-                          noseColor: viewModel.noseColor,
-                          noseBgColor: viewModel.noseBgColor,
-                        ),
-                      ),
+                        return SizedBox(
+                          width: paintSize.width,
+                          height: paintSize.height,
+                          child: GestureDetector(
+                            onTapDown: (details) => viewModel.handleTap(
+                              details.localPosition,
+                              paintSize,
+                                  () {
+                                Future.delayed(const Duration(seconds: 2), () async {
+                                  final timerVM = Provider.of<GameTimerViewModel>(context, listen: false);
+                                  timerVM.stopTimer();
+
+                                  final vm2 = Provider.of<GameResultViewModel>(context, listen: false);
+                                  await vm2.saveGameResult(
+                                    letter: 'boyama_ayi',
+                                    totalClicks: viewModel.totalClicks,
+                                    correctClicks: viewModel.correctClicks,
+                                    durationseconds: timerVM.totalSeconds,
+                                    koleksiyonadi: 'Sayilar',
+                                  );
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const HouseView(),
+                                    ),
+                                  );
+                                });
+                              },
+                            ),
+                            child: CustomPaint(
+                              size: paintSize,
+                              painter: CuteBearPainter(
+                                faceColor: viewModel.faceColor,
+                                earColor: viewModel.earColor,
+                                innerEarColor: viewModel.innerEarColor,
+                                noseColor: viewModel.noseColor,
+                                noseBgColor: viewModel.noseBgColor,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

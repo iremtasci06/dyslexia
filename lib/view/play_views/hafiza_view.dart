@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
+import '../../utils/orientation_helper.dart';
 import '../../viewModel/hafiza_view_model.dart';
+import 'game_view.dart';
 
 class HafizaPage extends StatefulWidget {
   const HafizaPage({super.key});
@@ -12,23 +13,19 @@ class HafizaPage extends StatefulWidget {
 }
 
 class _HafizaPageState extends State<HafizaPage> {
+  @override
+  void initState() {
+    super.initState();
+    OrientationHelper.setPortrait();
+  }
 
   @override
   void dispose() {
-    // Sayfa kapanınca tekrar yatay moda al
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    OrientationHelper.setLandscape();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    // Ekranı dikey moda sabitle
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
     return ChangeNotifierProvider(
       create: (_) => HafizaViewModel(),
       child: Scaffold(
@@ -40,6 +37,31 @@ class _HafizaPageState extends State<HafizaPage> {
         ),
         body: Consumer<HafizaViewModel>(
           builder: (context, vm, child) {
+            if (vm.shouldShowCompletedDialog) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                vm.consumeCompletedDialog();
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Tebrikler!"),
+                    content: const Text("Tüm kartları eşleştirdiniz 🎉"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const GameView()),
+                          );
+                        },
+                        child: const Text("Sonraki Sayfa"),
+                      ),
+                    ],
+                  ),
+                );
+              });
+            }
+
             return Padding(
               padding: const EdgeInsets.only(top: 80,right: 8,left: 8),
               child: Column(
@@ -56,7 +78,7 @@ class _HafizaPageState extends State<HafizaPage> {
                       ),
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                          onTap: () => vm.onCardTap(index, context),
+                          onTap: () => vm.onCardTap(index),
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),

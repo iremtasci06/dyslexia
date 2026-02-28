@@ -1,12 +1,12 @@
 import 'package:disleksi_surum/view/home_harf.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../utils/colors.dart';
+import '../../utils/orientation_helper.dart';
 import '../../viewModel/balon_view_model.dart';
 import '../../viewModel/game_result_viewmodel.dart';
 import '../../viewModel/game_timer_viewmodel.dart';
-class HarfBulPage extends StatelessWidget {
+class HarfBulPage extends StatefulWidget {
   final String hedefHarf;
   final List<String> harfListesi;
 
@@ -17,31 +17,86 @@ class HarfBulPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final widthscreen = MediaQuery.sizeOf(context).width;
-    final heightscreen = MediaQuery.sizeOf(context).height;
+  State<HarfBulPage> createState() => _HarfBulPageState();
+}
+
+class _HarfBulPageState extends State<HarfBulPage> {
+  @override
+  void initState() {
+    super.initState();
+    OrientationHelper.setPortrait();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Dikey moda sabitle
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-
-      // Timer başlat
       final timerVM = Provider.of<GameTimerViewModel>(context, listen: false);
       timerVM.reset();
       timerVM.startTimer();
     });
+  }
+
+  @override
+  void dispose() {
+    OrientationHelper.setLandscape();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final widthscreen = MediaQuery.sizeOf(context).width;
+    final heightscreen = MediaQuery.sizeOf(context).height;
 
     return ChangeNotifierProvider<BalonViewModel>(
       create: (_) {
         final vm = BalonViewModel();
-        vm.setGame(harfListesi, hedefHarf);
+        vm.setGame(widget.harfListesi, widget.hedefHarf);
         return vm;
       },
       child: Consumer<BalonViewModel>(
         builder: (context, vm, child) {
+          if (vm.pendingEvent != BalonGameEvent.none) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final event = vm.pendingEvent;
+              vm.consumePendingEvent();
+
+              if (event == BalonGameEvent.win) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Tebrikler 🎉"),
+                    content: Text("Tüm ${vm.hedefHarf} harflerini buldun!"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          vm.resetGame();
+                        },
+                        child: const Text("Yeniden Oyna"),
+                      )
+                    ],
+                  ),
+                );
+              }
+
+              if (event == BalonGameEvent.lose) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Oyun Bitti 😢"),
+                    content: const Text("Tüm balonların bitti."),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          vm.resetGame();
+                        },
+                        child: const Text("Tekrar Dene"),
+                      )
+                    ],
+                  ),
+                );
+              }
+            });
+          }
+
           if (vm.tablo.isEmpty) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
@@ -89,7 +144,7 @@ class HarfBulPage extends StatelessWidget {
                               final color = vm.renkler[index];
                               return GestureDetector(
                                 onTap: () async {
-                                  vm.kontrolEt(index, context);
+                                  vm.kontrolEt(index);
                                   if (vm.ballon == 0) {
                                     final timerVM = Provider.of<GameTimerViewModel>(
                                         context,
@@ -101,7 +156,7 @@ class HarfBulPage extends StatelessWidget {
                                         context,
                                         listen: false);
                                     await vm2.saveGameResult(
-                                      letter: hedefHarf,
+                                      letter: widget.hedefHarf,
                                       totalClicks: vm.totalClicks,
                                       correctClicks: vm.correctClicks,
                                       durationseconds: timerVM.totalSeconds,
@@ -163,10 +218,11 @@ class HarfBulPage extends StatelessWidget {
                   top: 20,
                   right: 10,
                   child: IconButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await OrientationHelper.setLandscape();
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => HarflerPage()),
+                        MaterialPageRoute(builder: (_) => const HarflerPage()),
                       );
                     },
                     icon: const Icon(Icons.home, color: Colors.white, size: 36),

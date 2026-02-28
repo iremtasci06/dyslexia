@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../utils/hikayeler.dart';
+import '../../utils/orientation_helper.dart';
 import '../../viewModel/game_result_viewmodel.dart';
 import '../../viewModel/game_timer_viewmodel.dart';
 import 'okuma_menu.dart';
@@ -25,19 +25,21 @@ class _ReadingPageState extends State<ReadingPage> {
   @override
   void initState() {
     super.initState();
+    OrientationHelper.setPortrait();
+
     final timerVM = Provider.of<GameTimerViewModel>(context, listen: false);
     timerVM.reset();
     timerVM.startTimer();
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Ekranı dikey moda sabitle
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+  void dispose() {
+    OrientationHelper.setLandscape();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     final story = stories[widget.storyIndex];
 
     // Metni kelimelere ayır

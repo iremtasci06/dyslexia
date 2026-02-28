@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'base_game_view_model.dart';
 
-class BalonViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  final int correctClicks = 6;
+enum BalonGameEvent { none, win, lose }
+
+class BalonViewModel extends BaseGameViewModel {
+  BalonViewModel() : super(correctClicks: 6);
+
   late List<String> harfler;
   late List<String> tablo;
   late List<Color?> renkler;
@@ -17,6 +20,9 @@ class BalonViewModel extends ChangeNotifier {
 
   int toplamHarf = 0;
   int bulunanHarf = 0;
+  BalonGameEvent _pendingEvent = BalonGameEvent.none;
+
+  BalonGameEvent get pendingEvent => _pendingEvent;
 
   // 🔹 Liste ve hedef harfi View'dan al
   void setGame(List<String> gelenHarfler, String hedef) {
@@ -42,7 +48,7 @@ class BalonViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void kontrolEt(int index, BuildContext context) {
+  void kontrolEt(int index) {
     if (tablo[index] == hedefHarf) {
       if (renkler[index] != Colors.green) {
         bulunanHarf++;
@@ -67,24 +73,8 @@ class BalonViewModel extends ChangeNotifier {
 
         // ✅ Tüm hedef harfler bulundu mu?
         if (bulunanHarf == toplamHarf) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: const Text("Tebrikler 🎉"),
-                content: Text("Tüm $hedefHarf harflerini buldun!"),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      resetGame();
-                    },
-                    child: const Text("Yeniden Oyna"),
-                  )
-                ],
-              ),
-            );
-          });
+          _pendingEvent = BalonGameEvent.win;
+          notifyListeners();
         }
       }
     } else {
@@ -93,26 +83,14 @@ class BalonViewModel extends ChangeNotifier {
 
       // ❌ Balonlar bitti mi?
       if (_ballon <= 0) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text("Oyun Bitti 😢"),
-              content: const Text("Tüm balonların bitti."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    resetGame();
-                  },
-                  child: const Text("Tekrar Dene"),
-                )
-              ],
-            ),
-          );
-        });
+        _pendingEvent = BalonGameEvent.lose;
+        notifyListeners();
       }
     }
-    totalClicks++;
+    incrementTotalClicks();
+  }
+
+  void consumePendingEvent() {
+    _pendingEvent = BalonGameEvent.none;
   }
 }

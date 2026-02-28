@@ -1,12 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'base_game_view_model.dart';
 
-class MevsimViewModel extends ChangeNotifier{
-  int totalClicks = 0;
-  final int correctClicks = 1;
+class MevsimViewModel extends BaseGameViewModel {
+  MevsimViewModel() : super(correctClicks: 1);
+
   bool iskontrol = false;
 
   void kontrol(String path, String mevsim){
-    totalClicks++;
+    incrementTotalClicks();
     if(path == mevsim){
       iskontrol = true;
     }else{

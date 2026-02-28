@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:disleksi_surum/view/play_views/game_view.dart';
 import 'package:flutter/material.dart';
 
 class HafizaViewModel extends ChangeNotifier {
@@ -12,6 +11,9 @@ class HafizaViewModel extends ChangeNotifier {
   int get eslesmeyensayi => _eslesmeyensayi;
   int _eslesensayi=0;
   int get eslesensayi => _eslesensayi;
+  bool _shouldShowCompletedDialog = false;
+
+  bool get shouldShowCompletedDialog => _shouldShowCompletedDialog;
 
   HafizaViewModel() {
     _initGame();
@@ -37,7 +39,7 @@ class HafizaViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onCardTap(int index, BuildContext context) {
+  void onCardTap(int index) {
     if (revealed[index] || openedIndexes.length == 2) return;
 
     revealed[index] = true;
@@ -56,29 +58,8 @@ class HafizaViewModel extends ChangeNotifier {
 
         // oyun bitti mi?
         if (revealed.every((e) => e)) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: const Text("Tebrikler!"),
-                content: const Text("Tüm kartları eşleştirdiniz 🎉"),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context); // dialog'u kapat
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const GameView(), // hedef sayfa
-                        ),
-                      );
-                    },
-                    child: const Text("Sonraki Sayfa"),
-                  ),
-                ],
-              ),
-            );
-          });
+          _shouldShowCompletedDialog = true;
+          notifyListeners();
         }
 
       } else {
@@ -96,5 +77,9 @@ class HafizaViewModel extends ChangeNotifier {
 
   void resetGame() {
     _initGame();
+  }
+
+  void consumeCompletedDialog() {
+    _shouldShowCompletedDialog = false;
   }
 }

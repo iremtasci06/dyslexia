@@ -1,19 +1,17 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
+import 'base_game_view_model.dart';
 
-class SecViewModel extends ChangeNotifier {
-  String harf = 'D';
-  bool dogru = false;
-  int totalClicks = 0;
-  final int correctClicks = 1;
-  List<String> secenekler = [];
-
-  SecViewModel() {
+class SecViewModel extends BaseGameViewModel {
+  SecViewModel() : super(correctClicks: 1) {
     karistir(); // ilk başta karıştır
   }
 
+  String harf = 'D';
+  bool dogru = false;
+  List<String> secenekler = [];
+
   void DKontrol(String secilenHarf) {
-    totalClicks++;
+    incrementTotalClicks();
     dogru = (secilenHarf == harf);
     notifyListeners();
   }

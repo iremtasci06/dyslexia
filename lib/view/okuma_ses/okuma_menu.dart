@@ -1,7 +1,7 @@
 import 'package:disleksi_surum/view/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../utils/hikayeler.dart';
+import '../../utils/orientation_helper.dart';
 import 'okuma.dart';
 // <<< 1. DEĞİŞİKLİK: Anasayfa import edildi
 
@@ -16,24 +16,12 @@ class _ColorfulTextPageState extends State<ColorfulTextPage> {
   @override
   void initState() {
     super.initState();
-    // Sayfa açıldığında dikey moda sabitle
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    OrientationHelper.setPortrait();
   }
 
   @override
   void dispose() {
-    // Sayfa kapanınca tekrar yatay moda al
-    // NOT: Hangi sayfadan geldiğinize bağlı olarak, bu yatay moda alma işlemi
-    // sonraki sayfada problem yaratabilir. Eğer uygulama varsayılan olarak dikey
-    // çalışıyorsa, burayı kaldırıp sadece açılış sayfasında yönlendirme yapmak
-    // daha güvenli olabilir. Ancak mevcut isteğinizi koruyorum.
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    OrientationHelper.setLandscape();
     super.dispose();
   }
 

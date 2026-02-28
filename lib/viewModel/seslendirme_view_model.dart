@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'base_game_view_model.dart';
 
-class SpeechViewModel extends ChangeNotifier {
+class SpeechViewModel extends BaseGameViewModel {
+  SpeechViewModel() : super(correctClicks: 0);
+
   final stt.SpeechToText _speech = stt.SpeechToText();
 
   bool _isListening = false;
@@ -15,9 +17,6 @@ class SpeechViewModel extends ChangeNotifier {
   int currentIndex = 0;
   int currentCount = 0;
   final int maxSentences = 5;
-
-  int totalClicks = 0;     // toplam konuşulan kelime sayısı (tüm cümlelerde)
-  int correctClicks = 0;   // toplam doğru kelime sayısı (tüm cümlelerde)
 
   DateTime? sentenceStartTime;
 
@@ -99,7 +98,7 @@ class SpeechViewModel extends ChangeNotifier {
     if (isFinished || sentences.isEmpty) return;
 
     final result = getCurrentResult();
-    correctClicks += result['correctWords'] as int;
+    incrementCorrectClicks(result['correctWords'] as int);
 
     currentCount++;
     if (currentCount >= maxSentences) {
@@ -123,8 +122,7 @@ class SpeechViewModel extends ChangeNotifier {
     currentIndex = 0;
     currentCount = 0;
     isFinished = false;
-    totalClicks = 0;
-    correctClicks = 0;
+    resetGameCounters(correctClicksValue: 0, notify: false);
     sentenceStartTime = null;
     notifyListeners();
   }

@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'base_game_view_model.dart';
 
-class EggInputViewModel extends ChangeNotifier {
-  int totalClicks = 0;
-  final int correctClicks = 1;
+class EggInputViewModel extends BaseGameViewModel {
+  EggInputViewModel() : super(correctClicks: 1);
 
   bool kontrol=true;
 

@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:disleksi_surum/view/ortak_bosluk/yonerge.dart';
+import 'package:disleksi_surum/view/play_views/hikaye_sirala_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewModel/golge_view_model.dart';
@@ -27,6 +29,20 @@ class GolgeEslemePage extends StatelessWidget {
           ),
           child: Consumer<GolgeOyunViewModel>(
             builder: (context, viewModel, child) {
+              if (viewModel.shouldNavigateNext) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  viewModel.consumeNavigateNext();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const Yonerge(
+                        text: 'Hikayeyi sırala',
+                        page: HikayeSiralaPage(),
+                      ),
+                    ),
+                  );
+                });
+              }
 
               return Center(
                 child: Container(
@@ -45,7 +61,7 @@ class GolgeEslemePage extends StatelessWidget {
                           for (var target in img)
                             DragTarget<String>(
                               onAcceptWithDetails: (details) {
-                                viewModel.checkMatch(details.data, target,context);
+                                viewModel.checkMatch(details.data, target);
                               },
                               builder: (context, candidateData, rejectedData) {
                                 bool matched = viewModel.isMatched(target);

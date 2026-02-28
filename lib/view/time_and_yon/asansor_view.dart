@@ -1,7 +1,7 @@
 import 'package:disleksi_surum/view/time_and_yon/sagsol_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
+import '../../utils/orientation_helper.dart';
 import '../../viewModel/asansor_view_model.dart';
 import '../../viewModel/game_result_viewmodel.dart';
 import '../../viewModel/game_timer_viewmodel.dart';
@@ -18,10 +18,7 @@ class _ElevatorGamePageState extends State<ElevatorGamePage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    OrientationHelper.setPortrait();
     final timerVM = Provider.of<GameTimerViewModel>(context, listen: false);
     timerVM.reset();
     timerVM.startTimer();
@@ -29,12 +26,7 @@ class _ElevatorGamePageState extends State<ElevatorGamePage> {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    });
+    OrientationHelper.setLandscape();
     super.dispose();
   }
 

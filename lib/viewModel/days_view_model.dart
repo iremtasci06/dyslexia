@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'base_game_view_model.dart';
 
 class ActivityCard {
   final String title;
@@ -11,11 +11,14 @@ class ActivityCard {
 
 enum TimeCategory { YESTERDAY, TODAY, TOMORROW }
 
-class TimeTrainViewModel with ChangeNotifier {
+class TimeTrainViewModel extends BaseGameViewModel {
+  TimeTrainViewModel() : super(correctClicks: 7) {
+    _initTts();
+    draggableCards = List.from(allActivities)..shuffle();
+  }
+
   final FlutterTts tts = FlutterTts();
   TimeCategory currentFocus = TimeCategory.TODAY;
-  int totalClicks = 0;
-  final int correctClicks = 7;
 
   bool hasNavigated = false;
 
@@ -33,11 +36,6 @@ class TimeTrainViewModel with ChangeNotifier {
   List<ActivityCard> placedYesterday = [];
   List<ActivityCard> placedToday = [];
   List<ActivityCard> placedTomorrow = [];
-
-  TimeTrainViewModel() {
-    _initTts();
-    draggableCards = List.from(allActivities)..shuffle();
-  }
 
   void _initTts() {
     tts.setLanguage("tr-TR");
@@ -72,15 +70,15 @@ class TimeTrainViewModel with ChangeNotifier {
       switch (targetVagon) {
         case TimeCategory.YESTERDAY:
           placedYesterday.add(card);
-          totalClicks++;
+          incrementTotalClicks();
           break;
         case TimeCategory.TODAY:
           placedToday.add(card);
-          totalClicks++;
+          incrementTotalClicks();
           break;
         case TimeCategory.TOMORROW:
           placedTomorrow.add(card);
-          totalClicks++;
+          incrementTotalClicks();
           break;
       }
 
@@ -93,7 +91,7 @@ class TimeTrainViewModel with ChangeNotifier {
     }
   }
   void reset(){
-    totalClicks = 0;
+    resetGameCounters(correctClicksValue: 7, notify: false);
   }
 
   bool get isGameComplete => draggableCards.isEmpty;

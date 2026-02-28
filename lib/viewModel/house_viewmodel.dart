@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'base_game_view_model.dart';
 
-class HouseViewModel extends ChangeNotifier {
+class HouseViewModel extends BaseGameViewModel {
+  HouseViewModel() : super(correctClicks: 5);
+
   Color wallColor = Colors.white;
   Color roofColor = Colors.white;
   Color doorColor = Colors.white;
@@ -8,8 +11,6 @@ class HouseViewModel extends ChangeNotifier {
   Color windowColor = Colors.white;
 
   int? selectedNumber;
-  int totalClicks = 0;
-  int correctClicks = 5;
 
   final Map<int, Color> numberColors = {
     0: const Color(0xffF75270), // duvar
@@ -20,7 +21,7 @@ class HouseViewModel extends ChangeNotifier {
   };
 
   void selectNumber(int number) {
-    totalClicks++;
+    incrementTotalClicks();
     selectedNumber = number;
     notifyListeners();
   }

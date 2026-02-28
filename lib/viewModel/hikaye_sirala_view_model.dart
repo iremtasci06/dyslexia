@@ -1,13 +1,16 @@
 import 'dart:math';
-import 'package:disleksi_surum/view/play_views/yakala_view.dart';
 import 'package:flutter/material.dart';
-import '../view/ortak_bosluk/yonerge.dart';
 
 class HikayeSiralaViewModel extends ChangeNotifier {
   final List<String> correctOrder = ["ilksahne", "ikincisahne", "ucuncusahne"];
 
   List<String?> placedImages = [null, null, null];
   List<String> remainingImages = [];
+  bool _shouldNavigateNext = false;
+  bool _shouldShowTryAgain = false;
+
+  bool get shouldNavigateNext => _shouldNavigateNext;
+  bool get shouldShowTryAgain => _shouldShowTryAgain;
 
   HikayeSiralaViewModel() {
     _shuffleImages();
@@ -20,7 +23,7 @@ class HikayeSiralaViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void placeImage(int index, String image, BuildContext context) {
+  void placeImage(int index, String image) {
     if (placedImages[index] == null) {
       placedImages[index] = image;
       remainingImages.remove(image);
@@ -30,17 +33,11 @@ class HikayeSiralaViewModel extends ChangeNotifier {
       if (!placedImages.contains(null)) {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (_isCorrectOrder()) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => Yonerge(
-                  text: 'Sincapı yakala',
-                  page: const YakalamaGame(),
-                ),
-              ),
-            );
+            _shouldNavigateNext = true;
+            notifyListeners();
           } else {
-            _showTryAgainDialog(context);
+            _shouldShowTryAgain = true;
+            notifyListeners();
           }
         });
       }
@@ -54,28 +51,17 @@ class HikayeSiralaViewModel extends ChangeNotifier {
     return true;
   }
 
-  void _showTryAgainDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Yanlış sıra 😢"),
-        content: const Text("Sahneleri doğru sırayla dizmeyi dene."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              resetGame();
-            },
-            child: const Text("Tekrar Dene"),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// 🔁 Oyunu sıfırla
   void resetGame() {
     placedImages = [null, null, null];
     _shuffleImages(); // tekrar karıştır
+  }
+
+  void consumeNavigateNext() {
+    _shouldNavigateNext = false;
+  }
+
+  void consumeTryAgainDialog() {
+    _shouldShowTryAgain = false;
   }
 }
