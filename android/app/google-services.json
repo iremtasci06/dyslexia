@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "821487765809",
+    "project_id": "dislexa-f9606",
+    "storage_bucket": "dislexa-f9606.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821487765809:android:c126c8982e97d3f1e0c810",
+        "android_client_info": {
+          "package_name": "com.lexa.disleksi_surum"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDABL7kiQGfA7FkCstYg1nTeLsb4ecAPOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
